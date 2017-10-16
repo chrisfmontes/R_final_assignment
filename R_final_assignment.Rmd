@@ -69,3 +69,12 @@ maize_snp_genotype <- merge(snp_sub, transp_maize_genotypes, by = "SNP_ID")
 teo_snp_genotype <- merge(snp_sub, transp_teo_genotypes, by = "SNP_ID")
 ```
 
+###Extracting chromosome data
+I first want to create a folder for my output files:
+```{r}
+dir.create("output_files")
+```
+
+For the extraction I will use a for loop:
+```{r}
+for 
