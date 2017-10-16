@@ -3,7 +3,7 @@ title: "R Final Assignment Notebook"
 output: html_notebook
 ---
 
-##Data Inspection
+## Data Inspection
 For data inspection, I first copied the files from the [BCB546X repository](https://github.com/EEOB-BioData/BCB546X-Fall2017) to my [Assignment repository](https://github.com/dormilon/R_final_assignment) and inspected the folder from R:
 ```{r}
 file.info(dir("Original_files/", full.names = T))
@@ -27,8 +27,8 @@ dim(snp)
 ```
 From this we can appreciate that `genotypes` is a data frame object with 2,782 observations (rows) and 986 variables (columns). The `snp` object is a data frame with 983 observations (rows) and 15 variables (columns).
 
-##Data Processing
-###Prepared files for 'join':
+## Data Processing
+### Prepared files for 'join':
 Extracted maize- and teosinte-specific data, respectively.
 ```{r}
 maize_genotypes <- subset(genotypes, Group == "ZMMIL" | Group == "ZMMLR" | Group == "ZMMMR")
@@ -57,7 +57,7 @@ snp <- snp[order(snp$SNP_ID),]
 ```
 
 
-###Joining the files and preparing for the extraction of the data:
+### Joining the files and preparing for the extraction of the data:
 One more format for the `snp` data frame before merging. I created a subset of `snp` with the requested columns and changed the type of the "Position" column from "factor" to "numeric":
 ```{r}
 snp_sub <- snp[,c(1,3,4)]
@@ -70,7 +70,7 @@ maize_snp_genotype <- merge(snp_sub, transp_maize_genotypes, by = "SNP_ID")
 teo_snp_genotype <- merge(snp_sub, transp_teo_genotypes, by = "SNP_ID")
 ```
 
-###Extracting chromosome data
+### Extracting chromosome data
 I first want to create a folder for my output files:
 ```{r}
 dir.create("output_files")
