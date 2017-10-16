@@ -1,2 +1,2 @@
 # R_final_assignment
-asdf
+See R_final_assignment.Rmd for details

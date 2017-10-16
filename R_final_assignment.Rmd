@@ -4,12 +4,27 @@ output: html_notebook
 ---
 
 ##Data Inspection
-For data inspection, I first copied the files from the [BCB546X repository](https://github.com/EEOB-BioData/BCB546X-Fall2017) to my [Assignment repository](https://github.com/dormilon/R_final_assignment) and inspected the folder:
+For data inspection, I first copied the files from the [BCB546X repository](https://github.com/EEOB-BioData/BCB546X-Fall2017) to my [Assignment repository](https://github.com/dormilon/R_final_assignment) and inspected the folder from R:
 ```{r}
-file.info(dir("Original_files/"))
+file.info(dir("Original_files/", full.names = T))
 ```
+Here, we can see that there are 4 files on the folder and that `fang_et_al_genotypes.txt` is 11051939 bytes and `snp_position.txt` is 82763 bytes.
 
+
+I second open and read the `fang_et_al_genotypes.txt` and `snp_position.txt` files using:
 ```{r}
 genotypes <- read.table(file = "Original_files/fang_et_al_genotypes.txt", sep = "\t", header = T)
 snp <- read.table(file = "Original_files/snp_position.txt", sep = "\t", header = T)
 ```
+
+
+After creating the objects `genotypes` and `snp` I inspected their properties and dimensions using:
+```{r}
+str(genotypes)
+str(snp)
+dim(genotypes)
+dim(snp)
+```
+From this we can appreciate that `genotypes` is a data frame object with 2,782 observations (rows) and 986 variables (columns). The `snp` object is a data frame with 983 observations (rows) and 15 variables (columns).
+
+##Data Processing
