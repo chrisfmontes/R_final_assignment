@@ -28,3 +28,44 @@ dim(snp)
 From this we can appreciate that `genotypes` is a data frame object with 2,782 observations (rows) and 986 variables (columns). The `snp` object is a data frame with 983 observations (rows) and 15 variables (columns).
 
 ##Data Processing
+###Prepared files for 'join':
+Extracted maize- and teosinte-specific data, respectively.
+```{r}
+maize_genotypes <- subset(genotypes, Group == "ZMMIL" | Group == "ZMMLR" | Group == "ZMMMR")
+teo_genotypes <- subset(genotypes, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+```
+
+Next, I transposed the both data frames, mantaining the object type:
+```{r}
+transp_maize_genotypes <- as.data.frame(t(maize_genotypes))
+transp_teo_genotypes <- as.data.frame(t(teo_genotypes))
+```
+
+Get rid of the first three rows on the transposed data and create a new column with the row names (this is going to be our common column for merging the data).
+```{r}
+transp_maize_genotypes <- transp_maize_genotypes[-c(1:3),]
+transp_teo_genotypes <- transp_teo_genotypes[-c(1:3),]
+transp_maize_genotypes$SNP_ID <- rownames(transp_maize_genotypes)
+transp_teo_genotypes$SNP_ID <- rownames(transp_teo_genotypes)
+```
+
+Next, sorted the data frames, just to be sure:
+```{r}
+transp_maize_genotypes <- transp_maize_genotypes[order(transp_maize_genotypes$SNP_ID),]
+transp_teo_genotypes <- transp_teo_genotypes[order(transp_teo_genotypes$SNP_ID),]
+snp <- snp[order(snp$SNP_ID),]
+```
+
+
+###Joining the files and preparing for the extraction of the data:
+One more format for the `snp` data frame before merging. I created a subset of `snp` with the requested columns:
+```{r}
+snp_sub <- snp[,c(1,3,4)]
+```
+
+Used `merge` to join the data:
+```{r}
+maize_snp_genotype <- merge(snp_sub, transp_maize_genotypes, by = "SNP_ID")
+teo_snp_genotype <- merge(snp_sub, transp_teo_genotypes, by = "SNP_ID")
+```
+
