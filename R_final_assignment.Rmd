@@ -1,0 +1,15 @@
+---
+title: "R Final Assignment Notebook"
+output: html_notebook
+---
+
+##Data Inspection
+For data inspection, I first copied the files from the [BCB546X repository](https://github.com/EEOB-BioData/BCB546X-Fall2017) to my [Assignment repository](https://github.com/dormilon/R_final_assignment) and inspected the folder:
+```{r}
+file.info(dir("Original_files/"))
+```
+
+```{r}
+genotypes <- read.table(file = "Original_files/fang_et_al_genotypes.txt", sep = "\t", header = T)
+snp <- read.table(file = "Original_files/snp_position.txt", sep = "\t", header = T)
+```
