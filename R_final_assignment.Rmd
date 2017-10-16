@@ -58,9 +58,10 @@ snp <- snp[order(snp$SNP_ID),]
 
 
 ###Joining the files and preparing for the extraction of the data:
-One more format for the `snp` data frame before merging. I created a subset of `snp` with the requested columns:
+One more format for the `snp` data frame before merging. I created a subset of `snp` with the requested columns and changed the type of the "Position" column from "factor" to "numeric":
 ```{r}
 snp_sub <- snp[,c(1,3,4)]
+snp_sub[,3] <- as.numeric(levels(snp_sub[,3]))[snp_sub$Position]
 ```
 
 Used `merge` to join the data:
@@ -75,6 +76,40 @@ I first want to create a folder for my output files:
 dir.create("output_files")
 ```
 
-For the extraction I will use a for loop:
+
+For the extraction I will first sort the data by position and then use a for loop:
 ```{r}
-for 
+teo_snp_genotype <- teo_snp_genotype[order(teo_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("teo_chr", i, "_increas", sep = ""), subset(teo_snp_genotype, Chromosome == i))
+  write.table(x = get(paste("teo_chr", i, "_increas", sep = "")), file = paste("output_files/","teo_chr", i, ".increasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
+```{r}
+maize_snp_genotype <- maize_snp_genotype[order(maize_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("maize_chr", i, "_increas", sep = ""), subset(maize_snp_genotype, Chromosome == i))
+  write.table(x = get(paste("maize_chr", i, "_increas", sep = "")), file = paste("output_files/","maize_chr", i, ".increasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
+For the second extraction I will first sort the data by position and then use a for loop, including a subsitution of the "?" character for the "-" character:
+```{r}
+teo_snp_genotype <- teo_snp_genotype[order(-teo_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("teo_chr", i, "_decreas", sep = ""), subset(teo_snp_genotype, Chromosome == i))
+  assign(paste("teo_chr", i, "_decreas", sep = ""), data.frame(lapply(get(paste("teo_chr", i, "_decreas", sep = "")), function(x) {gsub(pattern = "\\?", replacement = "-", x) })))
+  write.table(x = get(paste("teo_chr", i, "_decreas", sep = "")), file = paste("output_files/","teo_chr", i, ".decreasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
+```{r}
+maize_snp_genotype <- maize_snp_genotype[order(-maize_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("maize_chr", i, "_decreas", sep = ""), subset(maize_snp_genotype, Chromosome == i))
+  assign(paste("maize_chr", i, "_decreas", sep = ""), data.frame(lapply(get(paste("maize_chr", i, "_decreas", sep = "")), function(x) {gsub(pattern = "\\?", replacement = "-", x) })))
+  write.table(x = get(paste("maize_chr", i, "_decreas", sep = "")), file = paste("output_files/","maize_chr", i, ".decreasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
