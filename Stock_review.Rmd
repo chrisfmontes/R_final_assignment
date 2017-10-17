@@ -1,0 +1,134 @@
+---
+title: "R Final Assignment Notebook"
+output: html_notebook
+---
+
+**#JS Edits highlighted in bold.**
+
+## Data Inspection
+For data inspection, I first copied the files from the [BCB546X repository](https://github.com/EEOB-BioData/BCB546X-Fall2017) to my [Assignment repository](https://github.com/dormilon/R_final_assignment) and inspected the folder from R:
+```{r}
+file.info(dir("Original_files/", full.names = T))
+```
+Here, we can see that there are 4 files on the folder and that `fang_et_al_genotypes.txt` is 11051939 bytes and `snp_position.txt` is 82763 bytes.
+
+
+I second open and read the `fang_et_al_genotypes.txt` and `snp_position.txt` files using:
+```{r}
+genotypes <- read.table(file = "Original_files/fang_et_al_genotypes.txt", sep = "\t", header = T)
+snp <- read.table(file = "Original_files/snp_position.txt", sep = "\t", header = T)
+```
+
+
+After creating the objects `genotypes` and `snp` I inspected their properties and dimensions using:
+```{r}
+str(genotypes)
+str(snp)
+dim(genotypes)
+dim(snp)
+```
+From this we can appreciate that `genotypes` is a data frame object with 2,782 observations (rows) and 986 variables (columns). The `snp` object is a data frame with 983 observations (rows) and 15 variables (columns).
+
+## Data Processing
+### Prepared files for 'join':
+Extracted maize- and teosinte-specific data, respectively.
+```{r}
+maize_genotypes <- subset(genotypes, Group == "ZMMIL" | Group == "ZMMLR" | Group == "ZMMMR")
+teo_genotypes <- subset(genotypes, Group == "ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+```
+
+Next, I transposed the both data frames, mantaining the object type:
+```{r}
+transp_maize_genotypes <- as.data.frame(t(maize_genotypes))
+transp_teo_genotypes <- as.data.frame(t(teo_genotypes))
+```
+
+Get rid of the first three rows on the transposed data and create a new column with the row names (this is going to be our common column for merging the data).
+```{r}
+transp_maize_genotypes <- transp_maize_genotypes[-c(1:3),]
+transp_teo_genotypes <- transp_teo_genotypes[-c(1:3),]
+transp_maize_genotypes$SNP_ID <- rownames(transp_maize_genotypes)
+transp_teo_genotypes$SNP_ID <- rownames(transp_teo_genotypes)
+```
+
+Next, sorted the data frames, just to be sure:
+```{r}
+transp_maize_genotypes <- transp_maize_genotypes[order(transp_maize_genotypes$SNP_ID),]
+transp_teo_genotypes <- transp_teo_genotypes[order(transp_teo_genotypes$SNP_ID),]
+snp <- snp[order(snp$SNP_ID),]
+```
+
+
+### Joining the files and preparing for the extraction of the data:
+One more format for the `snp` data frame before merging. I created a subset of `snp` with the requested columns and changed the type of the "Position" column from "factor" to "numeric":
+```{r}
+snp_sub <- snp[,c(1,3,4)]
+snp_sub[,3] <- as.numeric(levels(snp_sub[,3]))[snp_sub$Position]
+```
+
+**#This changes code that would be multiple, unknown or NA, to NA. If this was your intention, it is correct, but be careful if this was not your intention.**
+
+Used `merge` to join the data:
+```{r}
+maize_snp_genotype <- merge(snp_sub, transp_maize_genotypes, by = "SNP_ID")
+teo_snp_genotype <- merge(snp_sub, transp_teo_genotypes, by = "SNP_ID")
+```
+
+### Extracting chromosome data
+I first want to create a folder for my output files:
+```{r}
+dir.create("output_files")
+```
+
+
+For the extraction I will first sort the data by position and then use a for loop:
+
+**#I was under the assumption that when we replaced ?/? within the data frame we were supposed to replace with just a "-". I've editted this code to do this.**
+
+```{r}
+teo_snp_genotype <- teo_snp_genotype[order(teo_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("teo_chr", i, "_increas", sep = ""), subset(teo_snp_genotype, Chromosome == i))
+  assign(paste("teo_chr", i, "_increas", sep = ""), data.frame(lapply(get(paste("teo_chr", i, "_increas", sep = "")), function(x) {gsub(pattern = "\\?\\/\\?", replacement = "\\?", x) })))
+  write.table(x = get(paste("teo_chr", i, "_increas", sep = "")), file = paste("output_files/","teo_chr", i, ".increasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
+```{r}
+maize_snp_genotype <- maize_snp_genotype[order(maize_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("maize_chr", i, "_increas", sep = ""), subset(maize_snp_genotype, Chromosome == i))
+  assign(paste("teo_chr", i, "_increas", sep = ""), data.frame(lapply(get(paste("teo_chr", i, "_increas", sep = "")), function(x) {gsub(pattern = "\\?\\/\\?", replacement = "\\?", x) })))
+  write.table(x = get(paste("maize_chr", i, "_increas", sep = "")), file = paste("output_files/","maize_chr", i, ".increasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
+For the second extraction I will first sort the data by position and then use a for loop, including a subsitution of the "?" character for the "-" character:
+
+**#I was under the assumption that when we replaced ?/? within the data frame we were supposed to replace with just a "-". I've editted this code to do this.**
+
+```{r}
+teo_snp_genotype <- teo_snp_genotype[order(-teo_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("teo_chr", i, "_decreas", sep = ""), subset(teo_snp_genotype, Chromosome == i))
+  assign(paste("teo_chr", i, "_decreas", sep = ""), data.frame(lapply(get(paste("teo_chr", i, "_decreas", sep = "")), function(x) {gsub(pattern = "\\?\\/\\?", replacement = "\\-", x) })))
+  write.table(x = get(paste("teo_chr", i, "_decreas", sep = "")), file = paste("output_files/","teo_chr", i, ".decreasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
+```{r}
+maize_snp_genotype <- maize_snp_genotype[order(-maize_snp_genotype$Position),]
+for (i in 1:10) {
+  assign(paste("maize_chr", i, "_decreas", sep = ""), subset(maize_snp_genotype, Chromosome == i))
+  assign(paste("maize_chr", i, "_decreas", sep = ""), data.frame(lapply(get(paste("maize_chr", i, "_decreas", sep = "")), function(x) {gsub(pattern = "\\?\\/\\?", replacement = "\\-", x) })))
+  write.table(x = get(paste("maize_chr", i, "_decreas", sep = "")), file = paste("output_files/","maize_chr", i, ".decreasing.txt", sep = ""), quote = F, sep = "\t", row.names = F, col.names = F )
+}
+```
+
+## Part II
+```{r}
+library("ggplot2")
+
+```
+
+**#Nice, easy code to follow in Part I. I chaged only one portion as documented above in changing the ?/? to either just ? or -. Part II I didn't review as unfortunately there was no content. This was challenging for me also and I'm sure I didn't do it in the manner in which it was probably supposed to be done.**
