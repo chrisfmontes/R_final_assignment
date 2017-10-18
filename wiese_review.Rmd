@@ -3,3 +3,24 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+# Wiese Review of R_Final_Assignment
+
+## Data Inspection
+
+Being as this is the shortest part of the project, there isn't much to say here.  You largely got what you needed to get and saw, more or less, what you needed to see.  While you could have looked for more, I've no real complaints about it.
+
+## Data Processing
+
+Overall, your method seems pretty close to what I used for this section, and it seems to have proven pretty effective in getting the processing done.  Everything seems to work as intended, I'm not getting any notable errors, etc.
+
+It was a good call, creating a folder for your output files.  I forgot to do that on mine, and it ended up making my main directory rather messy.
+
+Something that might've been good--though admittedly, this is sort of personal preference--is a check function used occasionally after large steps, to directly show everything is working as intended.
+
+Good use of the for loop.
+
+The largest issue I have is that there wasn't much commentary on your code.  Not totally necessary, but might've been useful to describe your reasoning for each particular step.
+
+## Data Visualization
+
+Not seeing this section, for my part, though I'm guessing you just ran out of time before you could take a stab at it.  That's understandable.
